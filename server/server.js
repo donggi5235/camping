@@ -1,70 +1,54 @@
 require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql2/promise');
 const cors = require('cors');
-const bodyParser = require('body-parser');
+const { sequelize } = require('./models');
+
+const authRouter = require('./routes/auth');
+const campsitesRouter = require('./routes/campsites');
+const reservationsRouter = require('./routes/reservations');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 // 미들웨어 설정
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// MySQL 연결 풀 생성
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+// 라우트 설정
+app.use('/api/auth', authRouter);
+app.use('/api/campsites', campsitesRouter);
+app.use('/api/reservations', reservationsRouter);
 
-// 캠핑장 목록 조회
-app.get('/api/campsites', async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM campsites');
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
-  }
-});
-
-// 캠핑장 상세 정보 조회
-app.get('/api/campsites/:id', async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM campsites WHERE id = ?', [req.params.id]);
-    if (rows.length === 0) {
-      return res.status(404).send('Campsite not found');
+// 데이터베이스 연결 확인 및 서버 시작
+sequelize.authenticate()
+  .then(() => {
+    console.log('Database connected');
+    
+    if (process.env.NODE_ENV === 'development') {
+      sequelize.sync({ force: false })
+        .then(() => {
+          console.log('Database synced');
+          startServer();
+        })
+        .catch(err => console.error('Sync error:', err));
+    } else {
+      startServer();
     }
-    res.json(rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
-  }
+  })
+  .catch(err => console.error('Connection error:', err));
+
+function startServer() {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
+
+// 에러 핸들러
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something broke!' });
 });
 
-// 예약 생성
-app.post('/api/reservations', async (req, res) => {
-  try {
-    const { campsite_id, user_name, user_phone, user_email, start_date, end_date, guests } = req.body;
-    
-    const [result] = await pool.query(
-      'INSERT INTO reservations (campsite_id, user_name, user_phone, user_email, start_date, end_date, guests) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [campsite_id, user_name, user_phone, user_email, start_date, end_date, guests]
-    );
-    
-    res.status(201).json({ id: result.insertId });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
-  }
-});
-
-// 서버 시작
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled rejection:', err);
 });
