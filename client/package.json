@@ -11,18 +11,25 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.0.1",
+    "@radix-ui/react-label": "^2.1.6",
+    "@radix-ui/react-slot": "^1.2.2",
     "@remix-run/node": "^2.16.6",
     "@remix-run/react": "^2.16.6",
     "@remix-run/serve": "^2.16.6",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
     "isbot": "^4.4.0",
     "lucide-react": "^0.508.0",
     "react": "^18.3.1",
+    "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.56.3",
     "tailwind-merge": "^3.2.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.16.6",
@@ -47,7 +54,7 @@
     "node": ">=20.0.0"
   },
   "version": "1.0.0",
-  "description": "- 📖 [Remix docs](https://remix.run/docs)",
+  "description": "",
   "main": "postcss.config.js",
   "keywords": [],
   "author": "",

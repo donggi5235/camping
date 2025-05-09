@@ -1,21 +1,39 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card";
+import { getCampsites } from "~/lib/api";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "Camping" },
-    { name: "description", content: "Camping Page form REMIX" },
-  ];
-};
+export async function loader({ request }: LoaderFunctionArgs) {
+  const campsites = await getCampsites();
+  return json({ campsites });
+}
 
 export default function Index() {
+  const { campsites } = useLoaderData<typeof loader>();
+
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="flex flex-col items-center gap-16">
-        <header className="flex flex-col items-center gap-9">
-          <h1 className=""></h1>
-          <div className="h-[144px] w-[434px]"></div>
-        </header>
-        <nav className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-gray-200 p-6 dark:border-gray-700"></nav>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">캠핑장 목록</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {campsites.map((campsite: any) => (
+          <Card key={campsite.id}>
+            <CardHeader>
+              <CardTitle>{campsite.name}</CardTitle>
+              <CardDescription>{campsite.location}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-2">{campsite.description}</p>
+              <p className="font-medium">₩{campsite.price_per_night.toLocaleString()} / 박</p>
+              <a 
+                href={`/campsites/${campsite.id}`}
+                className="inline-block mt-4 text-sm font-medium text-primary hover:underline"
+              >
+                상세 보기
+              </a>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
