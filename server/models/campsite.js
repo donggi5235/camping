@@ -1,20 +1,33 @@
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const Campsite = sequelize.define('Campsite', {
     name: {
-      type: DataTypes.STRING(100),
-      allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        len: [1, 100]
+      }
     },
     description: {
       type: DataTypes.TEXT,
       allowNull: true
     },
     location: {
-      type: DataTypes.STRING(255),
-      allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        len: [1, 255]
+      }
     },
     price_per_night: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false
+      type: DataTypes.DECIMAL,
+      allowNull: false,
+      validate: {
+        min: 0
+      },
+      precision: 10,
+      scale: 2
     },
     capacity: {
       type: DataTypes.INTEGER,
@@ -25,8 +38,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     },
     image_url: {
-      type: DataTypes.STRING(255),
-      allowNull: true
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        len: [1, 255]
+      }
     }
   }, {
     tableName: 'campsites',

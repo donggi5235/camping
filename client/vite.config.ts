@@ -1,6 +1,7 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+//import { remixDevTools } from "remix-development-tools";
 
 declare module "@remix-run/node" {
   interface Future {
@@ -21,4 +22,13 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:5000", // 백엔드 주소
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });

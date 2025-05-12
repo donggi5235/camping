@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const { sequelize } = require('./models');
 
-const authRouter = require('./routes/auth');
 const campsitesRouter = require('./routes/campsites');
 const reservationsRouter = require('./routes/reservations');
 
@@ -15,7 +14,6 @@ app.use(cors());
 app.use(express.json());
 
 // 라우트 설정
-app.use('/api/auth', authRouter);
 app.use('/api/campsites', campsitesRouter);
 app.use('/api/reservations', reservationsRouter);
 
@@ -24,8 +22,9 @@ sequelize.authenticate()
   .then(() => {
     console.log('Database connected');
     
+    // 개발 환경에서만 테이블 재생성
     if (process.env.NODE_ENV === 'development') {
-      sequelize.sync({ force: false })
+      sequelize.sync({ force: false }) // force: true는 테이블을 삭제 후 재생성
         .then(() => {
           console.log('Database synced');
           startServer();

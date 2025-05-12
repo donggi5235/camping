@@ -3,7 +3,7 @@ const passport = require("passport");
 const User = require("../models/user");
 
 exports.join = async (req, res, next) => {
-  const { email, nick, password, money } = req.body;
+  const { name, email, password, phone, role } = req.body;
   try {
     const exUser = await User.findOne({ where: { email } });
     if (exUser) {
@@ -11,10 +11,12 @@ exports.join = async (req, res, next) => {
     }
     const hash = await bcrypt.hash(password, 12);
     await User.create({
+      name,
       email,
       nick,
       password: hash,
-      money,
+      phone,
+      role,
     });
     return res.redirect("/");
   } catch (error) {

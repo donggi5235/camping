@@ -1,10 +1,11 @@
-const { Sequelize } = require('sequelize');
+const Sequelize = require('sequelize');
+const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config');
+
 const CampsiteModel = require('./campsite');
 const ReservationModel = require('./reservation');
-const User = require('./user');
+const UserModel = require('./user');
 
-const env = process.env.NODE_ENV || 'development';
 const dbConfig = config[env];
 
 const sequelize = new Sequelize(
@@ -21,6 +22,7 @@ const sequelize = new Sequelize(
 
 const Campsite = CampsiteModel(sequelize);
 const Reservation = ReservationModel(sequelize);
+const User = UserModel(sequelize);
 
 // 모델 관계 설정
 Campsite.hasMany(Reservation, { foreignKey: 'campsite_id' });
@@ -31,7 +33,6 @@ Reservation.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = {
   sequelize,
-  Sequelize,
   Campsite,
   Reservation,
   User

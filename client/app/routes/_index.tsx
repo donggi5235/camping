@@ -3,6 +3,24 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card";
 import { getCampsites } from "~/lib/api";
+import { useRouteError } from "@remix-run/react";
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
+      <p className="text-lg mb-2">Failed to load campsites data.</p>
+      <p className="text-sm text-gray-600">
+        {error instanceof Error ? error.message : "Unknown error occurred"}
+      </p>
+      <a href="/" className="mt-4 inline-block text-blue-600 hover:underline">
+        Refresh page
+      </a>
+    </div>
+  );
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const campsites = await getCampsites();

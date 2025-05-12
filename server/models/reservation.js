@@ -1,4 +1,6 @@
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const Reservation = sequelize.define('Reservation', {
     start_date: {
       type: DataTypes.DATEONLY,
@@ -24,10 +26,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     }
   }, {
+    modelName: "Reservation",
     tableName: 'reservations',
     timestamps: true,
+    paranoid: true,
     createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    updatedAt: 'updated_at',
+    charset: "utf8",
+    collate: "utf8_general_ci",
   });
 
   return Reservation;

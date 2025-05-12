@@ -1,12 +1,12 @@
 const { Op } = require("sequelize");
-const { Good, Auction, User, sequelize } = require("../models");
+const { Campsite , Reservation, User, sequelize } = require("../models");
 const schedule = require("node-schedule");
 
 exports.renderMain = async (req, res, next) => {
   try {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1); // 어제 시간
-    const goods = await Good.findAll({
+    const goods = await Campsite.findAll({
       where: { SoldId: null, createdAt: { [Op.gte]: yesterday } },
     });
     res.render("main", {
@@ -25,50 +25,11 @@ exports.renderJoin = (req, res) => {
   });
 };
 
-exports.renderGood = (req, res) => {
-  res.render("good", { title: "상품 등록 - NodeAuction" });
+exports.renderCampsite = (req, res) => {
+  res.render("campsite", { title: "사이트 등록 - NodeAuction" });
 };
 
-exports.createGood = async (req, res, next) => {
-  try {
-    const { name, price } = req.body;
-    const good = await Good.create({
-      OwnerId: req.user.id,
-      name,
-      img: req.file.filename,
-      price,
-    });
-    const end = new Date();
-    end.setDate(end.getDate() + 1); // 하루 뒤
-    const job = schedule.scheduleJob(end, async () => {
-      const success = await Auction.findOne({
-        where: { GoodId: good.id },
-        order: [["bid", "DESC"]],
-      });
-      await good.setSold(success.UserId);
-      await User.update(
-        {
-          money: sequelize.literal(`money - ${success.bid}`),
-        },
-        {
-          where: { id: success.UserId },
-        }
-      );
-    });
-    job.on("error", (err) => {
-      console.error("스케줄링 에러", err);
-    });
-    job.on("success", () => {
-      console.log("스케줄링 성공");
-    });
-    res.redirect("/");
-  } catch (error) {
-    console.error(error);
-    next(error);
-  }
-};
-
-exports.renderAuction = async (req, res, next) => {
+exports.renderReservation = async (req, res, next) => {
   try {
     const [good, auction] = await Promise.all([
       Good.findOne({
