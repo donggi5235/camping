@@ -9,7 +9,7 @@ router.post('/register',
   [
     body('name').notEmpty().withMessage('이름을 입력해주세요'),
     body('email').isEmail().withMessage('유효한 이메일을 입력해주세요'),
-    body('password').isLength({ min: 6 }).withMessage('비밀번호는 최소 6자 이상이어야 합니다'),
+    body('password').isLength({ min: 8 }).withMessage('비밀번호는 최소 8자 이상이어야 합니다'),
     body('phone').notEmpty().withMessage('전화번호를 입력해주세요')
   ],
   async (req, res) => {
